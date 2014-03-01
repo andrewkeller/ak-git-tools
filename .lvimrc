@@ -1,0 +1,17 @@
+" .lvimrc
+"
+" Copyright (c) 2013 - 2014, Andrew Keller
+"
+" Sets standard Vim settings for this project.
+
+" Turn on automatic indenting:
+set ai sw=4
+
+" If tabs do exist, they should be 4 spaces wide:
+set ts=4
+
+" If tabs do exist, expand them to spaces.
+set expandtab
+
+" Set the page gutter:
+set colorcolumn=80
