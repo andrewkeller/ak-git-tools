@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# git-repocache-submodule
+#
+# Copyright (c) 2013 - 2014, Andrew Keller
+#
+# A wrapper around `git submodule` which appends all of the arguments provided
+# to this script, and then appends a --reference parameter pointing to the
+# repocache.
+#
+# Because only `git submodule add` and `git submodule update` take a --reference
+# parameter, this command only works with those commands.
+
+REPOCACHE_DIR=$(git repocache-path) || exit $?
+
+RECURSIVE_ARG=
+RECURSIVE_ARG_PRINT=
+
+for arg in "$@"
+do
+if [ "$arg" == "--recursive" ]
+then
+RECURSIVE_ARG=$arg
+RECURSIVE_ARG_PRINT=" $arg"
+break
+fi
+done
+
+function cat_alternates()
+{
+    git submodule --quiet foreach $1 git rev-parse --git-dir |
+    perl -pne 'chomp; $_ = "$_/objects/info/alternates\0";' |
+    xargs -0 -n 1 sh -c 'if [ -e "$1" ]; then cat "$1"; fi' inline
+}
+
+ALTERNATES_BEFORE=$(cat_alternates $RECURSIVE_ARG)
+
+git submodule "$@" --reference "$REPOCACHE_DIR" || exit $?
+
+ALTERNATES_AFTER=$(cat_alternates $RECURSIVE_ARG)
+
+if [ "$ALTERNATES_BEFORE" != "$ALTERNATES_AFTER" ]
+then
+echo "
+Warning: Some of the updated submodules do not own all of their objects.  You
+         should run:
+             \`git submodule foreach$RECURSIVE_ARG_PRINT git disconnect-alternates\`
+         as soon as possible.
+" >&2
+fi
