@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# git-repocache-init
+#
+# Copyright (c) 2013 - 2014, Andrew Keller
+#
+# Runs `git init` in the repocache directory.  Creates the directory first if
+# needed.  Any additional arguments are passed to `git init`.
+#
+# The repocache is expected to be a bare repository.  You may use a non-bare
+# repository as the repocache, but this script will not create one for you.
+
+REPOCACHE_PATH=$(git repocache-path) || exit $?
+
+mkdir -p "$REPOCACHE_PATH" || exit $?
+
+cd "$REPOCACHE_PATH" || exit $?
+
+git init --bare "$@"

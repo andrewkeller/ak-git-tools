@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# git-repocache-clone
+#
+# Copyright (c) 2013 - 2014, Andrew Keller
+#
+# A wrapper around git-clone that adds a --reference parameter pointing to the
+# repocache.  Usage is the same as git-clone.
+
+REPOCACHE_DIR=$(git repocache-path) || exit $?
+
+git clone --reference "$REPOCACHE_DIR" "$@" || exit $?
+
+echo "
+Warning: The cloned repository does not own all its objects.
+         You should run \`git disconnect-alternates\` as soon
+         as possible.
+" >&2

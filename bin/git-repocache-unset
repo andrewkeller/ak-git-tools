@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# git-repocache-unset
+#
+# Copyright (c) 2013 - 2014, Andrew Keller
+#
+# Unsets the link to the repocache.
+
+if [ $# -ne 0 ]
+then
+echo "usage: `basename \"$0\"`" >&2
+exit 1
+fi
+
+git config --global --unset repocache.path

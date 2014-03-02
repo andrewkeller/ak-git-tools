@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# git-repocache-clone-by-name
+#
+# Copyright (c) 2013 - 2014, Andrew Keller
+#
+# A wrapper around git-clone that allows the user to specify the URI of the
+# repository using the name of a remote in the repocache instead of the URI
+# itself.  The repocache is also used for the clone.  For example, one may type:
+#
+#   git repocache-clone-by-name <remote name> <additional-git-clone-args>
+#
+# The name of the remote must be the first argument.  Any additional arguments
+# are passed to git-clone.
+
+REPOCACHE_DIR=$(git repocache-path) || exit $?
+
+if [ $# -lt 1 ]
+then
+echo "usage: `basename \"$0\"` <repository name> <additional git-clone args>" >&2
+exit 1
+fi
+
+REPO_NAME=$1
+shift
+
+REPO_URL=$(git --git-dir "$REPOCACHE_DIR" config --get "remote.$REPO_NAME.url")
+
+if [ -z "$REPO_URL" ]
+then
+echo "`basename \"$0\"`: unknown repository name: '$REPO_NAME'.
+Must be one of:
+`git --git-dir \"$REPOCACHE_DIR\" remote | perl -pne '$_="    $_";'`" >&2
+exit 1
+fi
+
+git clone --reference "$REPOCACHE_DIR" "$REPO_URL" "$@" || exit $?
+
+echo "
+Warning: The cloned repository does not own all its objects.
+         You should run \`git disconnect-alternates\` as soon
+         as possible.
+" >&2

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# git-repocache-exec
+#
+# Copyright (c) 2013 - 2014, Andrew Keller
+#
+# Invokes the given command in the repocache.
+
+REPOCACHE_PATH=$(git repocache-path) || exit $?
+
+if [ ! -d "$REPOCACHE_PATH" ]
+then
+echo "The currently set repocache does not exist.  Run \`git repocache-init\`
+to create the repository at the currently set path." >&2
+exit 1
+fi
+
+cd "$REPOCACHE_PATH" || exit $?
+
+"$@"

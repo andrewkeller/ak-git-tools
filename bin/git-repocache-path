@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# git-repocache-path
+#
+# Copyright (c) 2013 - 2014, Andrew Keller
+#
+# Prints to stdout the path to the repocache.
+
+if [ $# -ne 0 ]
+then
+echo "usage: `basename \"$0\"`" >&2
+exit 1
+fi
+
+if ! git config --get repocache.path
+then
+echo "git-repocache is not configured.  Run \`git repocache-set <path-to-repocache>\` to set
+the path to the repository that should be used by git-repocache." >&2
+exit 1
+fi

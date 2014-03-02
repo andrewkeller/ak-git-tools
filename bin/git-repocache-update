@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# git-repocache-update
+#
+# Copyright (c) 2013 - 2014, Andrew Keller
+#
+# Runs `git fetch --no-tags` for each remote in the repocache.
+
+if [ $# -ne 0 ]
+then
+echo "usage: `basename \"$0\"`" >&2
+exit 1
+fi
+
+git repocache-exec sh -c 'git remote | xargs -tn 1 git fetch --no-tags' "$0" || exit $?
+
+echo "`basename \"$0\"` completed successfully." >&2

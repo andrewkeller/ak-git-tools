@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# git-repocache
+#
+# Copyright (c) 2013 - 2014, Andrew Keller
+#
+# Invokes the given git command in the repocache.
+
+git repocache-exec git "$@"
