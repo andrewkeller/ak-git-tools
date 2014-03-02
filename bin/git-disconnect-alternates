@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# git-disconnect-alternates
+#
+# Copyright (c) 2013 - 2014, Andrew Keller
+#
+# Runs `git repack -a`, and deletes .git/objects/info/alternates.  Used to
+# safely disconnect any repository from any used alternates.
+
+ALTERNATES_FILE=$(git rev-parse --git-dir)/objects/info/alternates || exit $?
+
+if [ -f "$ALTERNATES_FILE" ]
+then
+
+git repack -a || exit $?
+rm "$(git rev-parse --git-dir)/objects/info/alternates"
+
+fi
