@@ -4,27 +4,36 @@
 #
 # Copyright (c) 2013 - 2014, Andrew Keller
 #
-# A wrapper around `git submodule` which appends all of the arguments provided
-# to this script, and then appends a --reference parameter pointing to the
+# This is a plumbing command.  For a more user-friendly version, see `git-su`.
+#
+# Invokes `git submodule`, passing all of the provided arguments.  Amongst the
+# provided arguments, this script adds a --reference parameter pointing to the
 # repocache.
 #
 # Because only `git submodule add` and `git submodule update` take a --reference
 # parameter, this command only works with those commands.
+#
+# This script operates with the philosophy that using references long-term is a
+# bad idea.  At the conclusion of this script, if any of the submodules are
+# using references, this script automatically calls `git disconnect-alternates`
+# in each of the submodules.  In theory, use cases exist where this may be
+# undesirable, but at the moment, such use cases are not supported.  To support
+# them, this script need only add a --no-disconnect-alternates option.
 
 REPOCACHE_DIR=$(git repocache-path) || exit $?
 
 RECURSIVE_ARG=
-RECURSIVE_ARG_PRINT=
 
 for arg in "$@"
 do
 if [ "$arg" == "--recursive" ]
 then
 RECURSIVE_ARG=$arg
-RECURSIVE_ARG_PRINT=" $arg"
 break
 fi
 done
+
+git submodule "$@" --reference "$REPOCACHE_DIR" || exit $?
 
 function cat_alternates()
 {
@@ -33,18 +42,11 @@ function cat_alternates()
     xargs -0 -n 1 sh -c 'if [ -e "$1" ]; then cat "$1"; fi' inline
 }
 
-ALTERNATES_BEFORE=$(cat_alternates $RECURSIVE_ARG)
-
-git submodule "$@" --reference "$REPOCACHE_DIR" || exit $?
-
-ALTERNATES_AFTER=$(cat_alternates $RECURSIVE_ARG)
-
-if [ "$ALTERNATES_BEFORE" != "$ALTERNATES_AFTER" ]
+if [ ! -z "$(cat_alternates $RECURSIVE_ARG)" ]
 then
-echo "
-Warning: Some of the updated submodules do not own all of their objects.  You
-         should run:
-             \`git submodule foreach$RECURSIVE_ARG_PRINT git disconnect-alternates\`
-         as soon as possible.
-" >&2
+    echo >&2
+    echo "Repacking..." >&2
+    echo >&2
+
+    git submodule foreach $RECURSIVE_ARG git disconnect-alternates || exit $?
 fi
