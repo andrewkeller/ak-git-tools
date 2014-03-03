@@ -6,6 +6,14 @@
 #
 # Runs the given command at the top level of the superproject repository.
 
+if [ "$1" == "--recursive" ]
+then
+RECURSIVE=1
+shift
+else
+RECURSIVE=0
+fi
+
 NEXT_LAYER=$(git rev-parse --show-toplevel) || exit $?
 
 while [ $? == 0 ]
@@ -14,4 +22,9 @@ do
     NEXT_LAYER=$(cd .. && git rev-parse --show-toplevel 2>/dev/null)
 done
 
-"$@"
+"$@" || exit $?
+
+if [ $RECURSIVE -gt 0 ]
+then
+git submodule foreach --recursive "$@" || exit $?
+fi

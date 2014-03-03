@@ -7,6 +7,4 @@
 # Runs `git clean` with the given arguments in the top level of the superproject
 # and in all submodules.
 
-git tenv git clean "$@" || exit $?
-
-git tenv git submodule foreach --recursive git clean "$@" || exit $?
+git tenv --recursive git clean "$@"

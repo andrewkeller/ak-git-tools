@@ -8,4 +8,17 @@
 
 cd "$(git rev-parse --show-toplevel)" || exit $?
 
-"$@"
+if [ "$1" == "--recursive" ]
+then
+RECURSIVE=1
+shift
+else
+RECURSIVE=0
+fi
+
+"$@" || exit $?
+
+if [ $RECURSIVE -gt 0 ]
+then
+git submodule foreach --recursive "$@" || exit $?
+fi
