@@ -68,16 +68,9 @@ The following is a list of all the commands supported by `git-repocache`:
 * `git repocache-path`: Retrieves the path to the repocache from Git and prints
   it to stdout.
 
-* `git repocache-set`: Sets the path to the repocache in Git in the `--global`
-  domain.  You are not required to use the global domain - the configuration key
-  is `repocache.path`, and you may put it wherever Git will find it.
-
 * `git repocache-submodule`: Invokes the given `git-submodule(1)` command in the
   current working directory.  Example:
 
         git repocache-submodule update --init --recursive
-
-* `git repocache-unset`: Commands Git to remove the `repocache.path`
-  configuration.
 
 * `git repocache-update`: Performs a fetch in the repocache.

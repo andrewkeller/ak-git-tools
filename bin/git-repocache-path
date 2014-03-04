@@ -14,7 +14,6 @@ fi
 
 if ! git config --get repocache.path
 then
-echo "git-repocache is not configured.  Run \`git repocache-set <path-to-repocache>\` to set
-the path to the repository that should be used by git-repocache." >&2
+echo "fatal: the configuration 'repocache.path' is not set." >&2
 exit 1
 fi
