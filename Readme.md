@@ -12,14 +12,41 @@ For a basic installation, run the installation script, like this:
 
 Using the above command as-is would install these tools into `/usr/bin`.
 
-The installation also adds an uninstaller, called `__uninstall_ak_git_tools`.
+The installation also adds an uninstaller, called `__uninstall-ak-git-tools`.
 Upon installation, the uninstaller is automatically ran first.  To uninstall
 manually, simply use the generated uninstaller:
 
     __uninstall-ak-git-tools /usr
 
+Additionally, some Git aliases exist that simplify the usage of a some of the
+core commands.  To set them, run:
+
+    ./set-aliases
+
+There is no uninstaller for the aliases added by `set-aliases`.
+
 Contents
 --------
+
+### Navigating the commit graph
+
+* `git graph ...`: A primitive version of `gitk` for use in a terminal.
+
+### Working with the working directory
+
+* `git scrub ...`: The same as `git clean`, except instead of running in the
+  current working directory, this starts in the top-level of the superproject,
+  and is recursive across all submodules.  To blow away all untracked files
+  everywhere in the entire superproject, run:
+
+        git scrub -xfd
+
+* `git su ...`: Update all submodules to the commit ID at which they are
+  intended to be checked out according to HEAD in the current repository.  To
+  initialize all submodules recursively starting with the current repository,
+  run:
+
+        git su --init
 
 ### Running commands
 
@@ -43,11 +70,11 @@ A collection of scripts for cloning faster.  See `git-repocache` (below).
 
 The "repocache" is a single bare repository that contains many remotes, and is
 used to speed up cloning by reducing the number of objects that must travel over
-the network.  The path to the repocache is stored in one of any configuration
-file owned by Git.
+the network.  If you're interested in the technicalities, read up on the
+`--reference` parameter to git-clone(1).
 
-If you're interested in the technicalities, read up on the `--reference`
-parameter to git-clone(1).
+To use `git-repocache`, you must set the property `repocache.path` in Git's
+global or system configuration.
 
 The following is a list of all the commands supported by `git-repocache`:
 
