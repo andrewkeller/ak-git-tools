@@ -3,6 +3,21 @@ ak-git-tools
 
 This is a collection of tools I use with Git that make life easier.
 
+Installing
+----------
+
+For a basic installation, run the installation script, like this:
+
+    ./install-ak-git-tools /usr
+
+Using the above command as-is would install these tools into `/usr/bin`.
+
+The installation also adds an uninstaller, called `__uninstall_ak_git_tools`.
+Upon installation, the uninstaller is automatically ran first.  To uninstall
+manually, simply use the generated uninstaller:
+
+    __uninstall-ak-git-tools /usr
+
 Contents
 --------
 
