@@ -6,4 +6,4 @@
 #
 # Invokes the given git command in the repocache.
 
-git repocache-exec git "$@"
+git repocache-env git "$@"

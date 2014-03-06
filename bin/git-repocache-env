@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# git-repocache-exec
+# git-repocache-env
 #
 # Copyright (c) 2013 - 2014, Andrew Keller
 #

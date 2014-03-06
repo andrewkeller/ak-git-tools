@@ -73,9 +73,9 @@ The following is a list of all the commands supported by `git-repocache`:
   Upon successful exit, you should then run `git disconnect-alternates` inside
   the newly cloned repository to prevent the repository from becoming corrupt.
 
-* `git repocache-exec`: Runs the given command inside the repocache.  Example:
+* `git repocache-env`: Runs the given command inside the repocache.  Example:
 
-        git repocache-exec pwd
+        git repocache-env pwd
 
 * `git repocache-init`: Runs `git init` inside the repocache.  Creates the
   directory first if necessary.

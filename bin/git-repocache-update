@@ -12,6 +12,6 @@ echo "usage: `basename \"$0\"`" >&2
 exit 1
 fi
 
-git repocache-exec sh -c 'git remote | xargs -tn 1 git fetch --no-tags' "$0" || exit $?
+git repocache-env sh -c 'git remote | xargs -tn 1 git fetch --no-tags' "$0" || exit $?
 
 echo "`basename \"$0\"` completed successfully." >&2
