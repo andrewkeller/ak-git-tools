@@ -4,49 +4,79 @@
 #
 # Copyright (c) 2013 - 2014, Andrew Keller
 #
-# This is a plumbing command.  For a more user-friendly version, see `git-su`.
+# This is a wrapper around `git-submodule(1)` that adds integration with
+# `git-repocache(1)`.
 #
-# Invokes `git submodule`, passing all of the provided arguments.  Amongst the
-# provided arguments, this script adds a --reference parameter pointing to the
-# repocache.
+# This command may be used as a complete replacement for `git-submodule(1)`, or,
+# if you have knowledge of when it actually matters, you may use it only when
+# you know you need it.  (For the record, this command only modifies the `add`
+# and `update` subcommands; everything else is passed though as-is.)
 #
-# Because only `git submodule add` and `git submodule update` take a --reference
-# parameter, this command only works with those commands.
-#
-# This script operates with the philosophy that using references long-term is a
-# bad idea.  At the conclusion of this script, if any of the submodules are
-# using references, this script automatically calls `git disconnect-alternates`
-# in each of the submodules.  In theory, use cases exist where this may be
+# This command operates with the philosophy that using references long-term is a
+# bad idea.  At the conclusion of this command, if this operation added any
+# references, this command automatically calls `git disconnect-alternates` in
+# each of the submodules.  In theory, use cases exist where this may be
 # undesirable, but at the moment, such use cases are not supported.  To support
-# them, this script need only add a --no-disconnect-alternates option.
+# them, this command need only add a --no-disconnect-alternates option.
 
-REPOCACHE_DIR=$(git repocache-path) || exit $?
+# The first parameter MUST be --quiet, or not.
 
+if [ "$1" == "--quiet" ]
+then
+QUIET_ARG=$1
+shift
+else
+QUIET_ARG=
+fi
+
+# The very next parameter MUST be the submodule command.
+
+REFERENCE_ARG_CAN_BE_USED=0
 RECURSIVE_ARG=
+case "$1" in
+    add )
+        REFERENCE_ARG_CAN_BE_USED=1
+        ;;
+    update )
+        REFERENCE_ARG_CAN_BE_USED=1
+        for arg in "$@"
+        do
+            if [ "$arg" == "--recursive" ]
+            then
+                RECURSIVE_ARG=$arg
+                break
+            fi
+        done
+        ;;
+esac
 
-for arg in "$@"
-do
-if [ "$arg" == "--recursive" ]
+if [ $REFERENCE_ARG_CAN_BE_USED -gt 0 ]
 then
-RECURSIVE_ARG=$arg
-break
+    REPOCACHE_DIR=$(git repocache-path) || exit $?
+
+    git submodule "$QUIET_ARG" "$@" --reference "$REPOCACHE_DIR" || exit $?
+
+    function cat_alternates()
+    {
+        git submodule --quiet foreach $1 git rev-parse --git-dir |
+        perl -pne 'chomp; $_ = "$_/objects/info/alternates\0";' |
+        xargs -0 -n 1 sh -c 'if [ -e "$1" ]; then cat "$1"; fi' inline
+    }
+
+    if [ ! -z "$(cat_alternates $RECURSIVE_ARG)" ]
+    then
+        echo >&2
+        echo "Repacking..." >&2
+        echo >&2
+
+        git submodule foreach $RECURSIVE_ARG git disconnect-alternates || exit $?
+    fi
+
+    exit 0;
 fi
-done
 
-git submodule "$@" --reference "$REPOCACHE_DIR" || exit $?
+# The requested `git-submodule(1)` command is not one that can use the
+# the repocache.  Let's forward the original invocation to `git-submodule(1)`
+# as-is.
 
-function cat_alternates()
-{
-    git submodule --quiet foreach $1 git rev-parse --git-dir |
-    perl -pne 'chomp; $_ = "$_/objects/info/alternates\0";' |
-    xargs -0 -n 1 sh -c 'if [ -e "$1" ]; then cat "$1"; fi' inline
-}
-
-if [ ! -z "$(cat_alternates $RECURSIVE_ARG)" ]
-then
-    echo >&2
-    echo "Repacking..." >&2
-    echo >&2
-
-    git submodule foreach $RECURSIVE_ARG git disconnect-alternates || exit $?
-fi
+exec git submodule $QUIET_ARG "$@"
