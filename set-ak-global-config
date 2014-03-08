@@ -1,0 +1,38 @@
+#!/bin/sh -x
+
+# set-ak-global-config
+#
+# Copyright (c) 2014, Andrew Keller
+#
+# Sets all of the Git configurations I like to have in the global domain.
+
+# Add my aliases (documented in Readme.md):
+git config --global alias.graph 'log --graph --oneline --decorate'
+git config --global alias.scrub 'tenv --recursive git clean'
+git config --global alias.su 'env git repocache-submodule update --recursive'
+
+# Turn on color everywhere:
+git config --global color.ui auto
+
+# Detect renames more often:
+git config --global diff.renames copy
+
+# Don't require <enter> when a single key is good enough:
+git config --global interactive.singlekey true
+
+# Set up merge options:
+git config --global merge.conflictstyle diff3
+git config --global merge.log true
+git config --global merge.summary true
+
+# When `git push` is ambiguous, default to pushing the current branch as-is:
+git config --global push.default current
+
+# When:
+#  * the current repository is not bare
+#  * the current repository is checked out on a branch <branch>
+#  * the current repository is being pushed to
+#  * the push wants to update <branch>
+# ... Allow it, acknowledging that the index and working directory will no
+# longer be in sync with <branch> or HEAD:
+git config --global receive.denyCurrentBranch ignore
