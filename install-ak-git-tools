@@ -18,10 +18,16 @@ uninstaller=$prefix/bin/__uninstall-ak-git-tools
 
 if [ -e "$uninstaller" ]
 then
+    echo "A previous installation exists.  Uninstalling..." >&2
+    echo >&2
     "$uninstaller" "$prefix" || exit $?
+    echo "Installing..." >&2
+    echo >&2
 fi
 
 mkdir -p "$prefix/bin" || exit $?
+touch "$uninstaller" || exit $?
+chmod +x "$uninstaller" || exit $?
 
 echo '#!/bin/sh
 
@@ -44,26 +50,63 @@ then
     exit 1
 fi
 ' > "$uninstaller" || exit $?
-chmod +x "$uninstaller"
+
+everything_installed_correctly=1
 
 for f in bin/*
 do
 
-    if cp "$f" "$prefix/bin/"
+    if [ -f "$prefix/$f" ]
     then
 
-        echo 'rm -f "$prefix/'$f'" || exit $?' >> "$uninstaller"
+        echo "SKIP $prefix/$f (file already exists)" >&2
+        everything_installed_correctly=0
 
     else
 
-        "$uninstaller" "$prefix"
-        rm -f "$uninstaller"
-        exit 1
+        if cp "$f" "$prefix/$f"
+        then
 
+            echo "INSTALL $prefix/$f" >&2
+            echo 'echo "UNINSTALL $prefix/'$f'" >&2' >> "$uninstaller"
+            echo 'rm -f "$prefix/'$f'" || exit $?' >> "$uninstaller"
+
+        else
+
+            # Is this failure worth bailing the entire install?
+            #
+            # Probably not.  Most of the errors worth bailing would have
+            # happened when the uninstaller was saved (above).
+
+            everything_installed_correctly=0
+
+        fi
     fi
 
 done
 
-echo 'rm -f "$prefix/bin/__uninstall-ak-git-tools" || exit $?' >> "$uninstaller"
+echo 'echo "UNINSTALL $prefix/bin/__uninstall-ak-git-tools" >&2
+rm -f "$prefix/bin/__uninstall-ak-git-tools" || exit $?
+echo "
+Uninstall successful." >&2' >> "$uninstaller"
 
-echo "Installation successful." >&2
+if [ $everything_installed_correctly -gt 0 ]
+then
+    echo "
+Installation successful." >&2
+else
+    echo "
+Some files were not installed because they already exist in the given prefix
+(see log above).  Concequently, those files were excluded from the generated
+uninstaller, so that when you upgrade or uninstall later, those files won't be
+deleted.
+
+If you would like those files to be overwritten, simply delete those files, and
+run this installer again the same way.
+
+If you would like to uninstall, use this command:
+
+    '$uninstaller' '$prefix'
+
+Other than that, the installation was successful." >&2
+fi
