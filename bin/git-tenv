@@ -6,12 +6,17 @@
 #
 # Runs the given command at the top level of the superproject repository.
 
+# `git-rev-parse(1)` does not like to look beyond the repository if $GIT_DIR is
+# set, which is what happens when this script is invoked from within git.
+
+unset GIT_DIR
+
 if [ "$1" == "--recursive" ]
 then
-RECURSIVE=1
-shift
+    RECURSIVE=1
+    shift
 else
-RECURSIVE=0
+    RECURSIVE=0
 fi
 
 NEXT_LAYER=$(git rev-parse --show-toplevel) || exit $?
@@ -26,5 +31,5 @@ done
 
 if [ $RECURSIVE -gt 0 ]
 then
-git submodule foreach --recursive "$@" || exit $?
+    git submodule foreach --recursive "$@" || exit $?
 fi
