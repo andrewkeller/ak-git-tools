@@ -11,13 +11,29 @@
 
 unset GIT_DIR
 
-if [ "$1" == "--recursive" ]
-then
-    RECURSIVE=1
-    shift
-else
-    RECURSIVE=0
-fi
+RECURSIVE=0
+SUBMODULE_QUIET_ARG=--quiet
+
+while true
+do
+
+    if [ "$1" == "--recursive" ]
+    then
+        RECURSIVE=1
+        shift
+        continue
+    fi
+
+    if [ "$1" == "--verbose" ]
+    then
+        SUBMODULE_QUIET_ARG=
+        shift
+        continue
+    fi
+
+    break
+
+done
 
 NEXT_LAYER=$(git rev-parse --show-toplevel) || exit $?
 
@@ -31,5 +47,5 @@ done
 
 if [ $RECURSIVE -gt 0 ]
 then
-    git submodule foreach --recursive "$@" || exit $?
+    git submodule $SUBMODULE_QUIET_ARG foreach --recursive "$@" || exit $?
 fi
