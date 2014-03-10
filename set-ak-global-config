@@ -8,7 +8,7 @@
 
 # Add my aliases (documented in Readme.md):
 git config --global alias.graph 'log --graph --oneline --decorate'
-git config --global alias.scrub 'tenv --recursive --verbose git clean'
+git config --global alias.scrub 'tenv --recursive git clean'
 git config --global alias.su 'env git repocache-submodule update --recursive'
 
 # Turn on color everywhere:

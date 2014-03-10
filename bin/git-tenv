@@ -12,7 +12,7 @@
 unset GIT_DIR
 
 RECURSIVE=0
-SUBMODULE_QUIET_ARG=--quiet
+SUBMODULE_QUIET_ARG=
 
 while true
 do
@@ -24,9 +24,9 @@ do
         continue
     fi
 
-    if [ "$1" == "--verbose" ]
+    if [ "$1" == "--quiet" ]
     then
-        SUBMODULE_QUIET_ARG=
+        SUBMODULE_QUIET_ARG=$1
         shift
         continue
     fi
