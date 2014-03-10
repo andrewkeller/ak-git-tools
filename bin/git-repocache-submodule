@@ -54,7 +54,7 @@ if [ $REFERENCE_ARG_CAN_BE_USED -gt 0 ]
 then
     REPOCACHE_DIR=$(git repocache-path) || exit $?
 
-    git submodule "$QUIET_ARG" "$@" --reference "$REPOCACHE_DIR" || exit $?
+    git submodule $QUIET_ARG "$@" --reference "$REPOCACHE_DIR" || exit $?
 
     function cat_alternates()
     {
