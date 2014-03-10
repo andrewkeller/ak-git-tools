@@ -8,9 +8,11 @@ Installing
 
 For a basic installation, run the installation script, like this:
 
-    ./install-ak-git-tools /usr
+    sudo ./install-ak-git-tools
 
-Using the above command as-is would install these tools into `/usr/bin`.
+Using the above command as-is would install these tools into `/usr/bin`.  The
+installation prefix (by default `/usr`) can be overridden by passing something
+as the first argument.
 
 The installation also adds an uninstaller, called `__uninstall-ak-git-tools`.
 Upon installation, the uninstaller is automatically ran first.  To uninstall

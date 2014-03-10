@@ -4,14 +4,14 @@
 #
 # Copyright (c) 2014, Andrew Keller
 #
-# Copies the contents of the `bin` folder into the given prefix ($1).
+# Installs the ak-git-tools into the `/usr` folder.  The prefix can be
+# overridden by passing something to $1.
 
 prefix=$1
 
 if [ -z "$prefix" ]
 then
-    echo "usage: `basename \"$0\"` <installation prefix>" >&2
-    exit 1
+    prefix=/usr
 fi
 
 uninstaller=$prefix/bin/__uninstall-ak-git-tools
