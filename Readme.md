@@ -85,7 +85,7 @@ The following is a list of all the commands supported by `git-repocache`:
 
 * `git repocache`: Invoke the given Git command in the repocache.  Example:
   
-      git repocache remote add git git://github.com/git/git.git
+        git repocache remote add git git://github.com/git/git.git
 
 * `git repocache-clone`: Performs a normal clone, but uses the repocache.
   Example:
