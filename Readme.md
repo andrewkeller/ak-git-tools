@@ -61,6 +61,10 @@ not include the aliases; run `set-ak-global-config` to set the aliases.
 * `git tenv ...`: Run the given command at the top of the superproject.  Add
   `--recursive` to also run in all submodules.
 
+* `git exec-repo-tool ...`: Run the given command in the current working
+  directory with the given arguments.  The command may live in any `tools`
+  directory in any repository in the current superproject.
+
 ### Manipulating the objects database
 
 * `git disconnect-alternates`: If the current repository is using alternates,

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# git-exec-repo-tool
+#
+# Copyright (c) 2014, Andrew Keller
+#
+# A wrapper around the standard Unix exec(1) which, before invoking the given
+# command with the given arguments, appends all of the 'tools' directories in
+# all repositories in this superproject to the PATH.
+
+new_dirs=$(git tenv --quiet --recursive pwd) || exit $?
+
+export PATH=$PATH$(echo "$new_dirs" | while read line; do echo ":$line/tools" | tr -d '\n'; done)
+
+exec "$@"
